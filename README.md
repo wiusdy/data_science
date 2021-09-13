@@ -1,1 +1,1 @@
-# data_science
+# This repository was created for a test challenge
