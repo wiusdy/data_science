@@ -1,9 +1,17 @@
+from re import X
 from data_manipulation.pre_processing import PreProcessing
 
-def main():
+def pre_process_data():
     preprocessing = PreProcessing()
-    filtered, number_of_filtered = preprocessing.filter_by_qtd_input(5, bigger=False)
-    print(filtered, number_of_filtered)
+    matrix = preprocessing.all_data_one_table()
+    data_frame = preprocessing.matrix_to_pandas_data_frame(matrix)
+    return preprocessing.get_trainable_data(data_frame)
+
+def main():
+    X_Train, X_Test = pre_process_data()
+    
+    
+    
 
 if __name__ == '__main__':
     main()
