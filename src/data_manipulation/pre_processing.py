@@ -49,6 +49,27 @@ class PreProcessing(object):
                         'calcule_distance_error': data['calcule_distance_error']}
                 matrix_data.append(sample)
         return matrix_data
+    
+    def build_data_as_samples(self):
+        matrix_data = []        
+        for data_idx, data in enumerate(self.data):
+            description = data['description']
+            input_names = ''              
+            mg_data = []          
+            for input in description['insumos']:
+                input_names+=' ' + input['input_name']
+                mg_data.append(input['mg_unit'])
+            sample = {  'insumo': input_names , 
+                        'vol_und': data['description']['unit_volume'],  
+                        'mg_und': np.median(mg_data), 
+                        'criado': data['criado'],
+                        'qtd_insumo': data['qtd_insumo'],
+                        'calculo': data['calculo'],
+                        'true_calcule': data['true_calculo'],
+                        'calcule_distance_error': data['calcule_distance_error']}
+            matrix_data.append(sample)
+                
+        return matrix_data
 
     def matrix_to_pandas_data_frame(self, matrix):
         only_values = []
@@ -57,16 +78,23 @@ class PreProcessing(object):
             only_values.append(line.values())
         return pd.DataFrame(only_values, columns=columns)
     
-    def get_trainable_data(self, data_frame):
+    def get_trainable_data(self, data_frame, scale=False):
         data_frame = data_frame.drop('insumo', axis=1)
         data_frame = data_frame.drop('criado', axis=1)        
         x = data_frame.values 
-        min_max_scaler = preprocessing.MinMaxScaler()
-        scaled_data = min_max_scaler.fit_transform(x)
+        if scale:           
+            
+            for column in data_frame.columns:
+                data_frame[column] = (data_frame[column] -
+                                    data_frame[column].mean()) / data_frame[column].std()
+            x = data_frame.values
         
-        X_train = scaled_data[:5121, :5]
-        X_test = scaled_data[5122:, :5]
-        return X_train, X_test
+        X_train = x[:5121, :4]
+        X_test = x[5122:, :4]
+
+        Y_train = x[:5121, 5:]
+        Y_test = x[5122:, 5:]
+        return X_train, X_test, Y_train, Y_test
                 
 
             
