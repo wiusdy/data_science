@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from datetime import datetime
 import re
 
 
@@ -45,10 +46,12 @@ class DataStructure(object):
                         'insumos': inputs,
 
                     },
-                    'criado': data_created,
+                    'criado': datetime.fromisoformat(data_created),
                     'qtd_insumo': float(qtd_input),
                     'calculo': float(calcule),
-                    'true_calculo': float(true_calcule)
+                    'true_calculo': float(true_calcule),
+                    'calcule_distance_error': np.linalg.norm(max([float(calcule), float(true_calcule)])-min([float(calcule), float(true_calcule)]))
+
                     }
                     data.append(sample)
                 
@@ -70,7 +73,7 @@ class DataStructure(object):
             input_metadata_mg = input_metadata[-1]
             input_mg = re.findall('[-+]?\d*\.\d+|\d+', str(input_metadata_mg))
             input_name = input.replace(str(input_metadata_mg), '')
-            data = {'input_name':input_name,
+            data = {'input_name':str(input_name).rstrip().lstrip(),
                     'mg_unit': float(''.join(input_mg))}
             inputs.append(data)
         
